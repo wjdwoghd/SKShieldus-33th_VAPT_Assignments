@@ -1,0 +1,27 @@
+========================
+쇼핑몰 15번
+========================
+
+1. 공격 과정
+   1) 문제 페이지에서 쿠폰 입력값을 검증하는 practice15.js 확인
+   2) couponValidation() 함수에서 쿠폰 생성 규칙 확인
+   3) 쿠폰 앞 4자리는 고정값 Eqst 사용
+   4) 현재 시간을 숫자로 계산한 뒤 charSet 배열에 매핑하여 couponfront 생성
+   5) memberid=cr7의 ASCII 값을 합산하여 couponmiddle 생성
+      810 + c(99) + r(114) + 7(55) = 1078
+      1078 => eSKi
+   6) 현재 시간값을 charSet에 매핑하여 couponfront 생성
+      2125 => yeyg
+   7) 앞 12자리를 조합
+      Eqst + yeyg + eSKi= EqstyeygeSKi
+   8) 첫 13자의 MD5 앞 2자리가 페이지의 md5hash=e8이 되도록 13번째 문자 유추
+      EqstyeygeSKi8 → MD5 앞 2자리 e8
+   9) 마지막에 md5hash 값 e8을 붙여 최종 쿠폰번호 완성
+      EqstyeygeSKi8e8
+   
+2. 쿠폰 번호
+   EqstyeygeSKi8e8
+
+3. 정답
+   manners_maketh_coupons
+========================

